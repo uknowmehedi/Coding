@@ -1,11 +1,54 @@
 <!-- ✅ 15 সেকেন্ড টাইমার উইন্ডোজ স্টাইল -->
-<div style="max-width:360px;margin:30px auto;padding:18px;border-radius:14px;background:linear-gradient(135deg,#141E30,#243B55);box-shadow:0 6px 16px rgba(0,0,0,0.3);color:#fff;font-family:sans-serif;text-align:center;">
-  <p style="margin:0 0 8px;font-size:15px;">⏳ অনুগ্রহ করে অপেক্ষা করুন <span id="sec">15</span> সেকেন্ড</p>
-  <div style="width:80%;height:6px;background:#ffffff30;border-radius:4px;margin:10px auto;">
-    <div id="progressBar" style="height:100%;width:0%;background:#00e676;transition:width 1s;"></div>
+<div class="timer-card">
+  <p class="timer-text">⏳ অনুগ্রহ করে অপেক্ষা করুন <span id="sec">15</span> সেকেন্ড</p>
+  <div class="progress-container">
+    <div id="progressBar" class="progress-bar"></div>
   </div>
-  <button id="timerButton" disabled style="padding:5px 14px;font-size:13px;background:#ffffff20;border:1px solid #fff;border-radius:20px;color:#fff;cursor:not-allowed;margin-top:8px;">লোড হচ্ছে...</button>
+  <button id="timerButton" disabled class="timer-button">লোড হচ্ছে...</button>
 </div>
+
+<style>
+.timer-card {
+  max-width: 360px;
+  margin: 30px auto;
+  padding: 18px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #141E30, #243B55);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  font-family: sans-serif;
+  text-align: center;
+}
+.timer-text {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.progress-container {
+  width: 80%;
+  height: 6px;
+  background: #ffffff30;
+  border-radius: 4px;
+  margin: 10px auto;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #00e676;
+  transition: width 1s;
+}
+.timer-button {
+  padding: 5px 14px;
+  font-size: 13px;
+  background: #ffffff20;
+  border: 1px solid #fff;
+  border-radius: 20px;
+  color: #fff;
+  cursor: not-allowed;
+  margin-top: 8px;
+  transition: all 0.3s;
+}
+</style>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
