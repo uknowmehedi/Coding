@@ -1,8 +1,8 @@
-<!-- ✅ Countdown Timer Card (Blogger Compatible) -->
-<div style="max-width:420px;margin:30px auto;padding:20px;border-radius:16px;background:linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);box-shadow:0 8px 20px rgba(0,0,0,0.2);color:#fff;position:relative;overflow:hidden;font-family:'Segoe UI',sans-serif;text-align:center;">
-  <div style="font-size:28px;margin-bottom:10px;">⏳ Limited Time Offer</div>
-  <p id="countdownText" style="font-size:16px;margin-bottom:20px;">Please wait 15 seconds...</p>
-  <button id="timerButton" disabled style="padding:12px 28px;font-size:16px;background:#ffffff40;border:2px solid #fff;border-radius:50px;color:#fff;cursor:not-allowed;transition:all 0.3s ease;">Loading...</button>
+<!-- ✅ Blogger-Compatible Countdown Card (Manual Click Only) -->
+<div style="max-width:420px;margin:30px auto;padding:20px;border-radius:16px;background:linear-gradient(135deg, #6a11cb, #2575fc);box-shadow:0 8px 20px rgba(0,0,0,0.2);color:#fff;position:relative;overflow:hidden;font-family:sans-serif;text-align:center;">
+  <div style="font-size:24px;margin-bottom:10px;">⏳ Limited Time Offer</div>
+  <p id="countdownText" style="font-size:16px;margin-bottom:20px;">Please wait <span id="sec">15</span> seconds...</p>
+  <button id="timerButton" disabled style="padding:12px 28px;font-size:16px;background:#ffffff40;border:2px solid #fff;border-radius:50px;color:#fff;cursor:not-allowed;transition:0.3s;">Loading...</button>
   <div style="position:absolute;top:0;left:0;width:100%;height:100%;border:3px dashed rgba(255,255,255,0.3);border-radius:16px;box-sizing:border-box;animation:borderRotate 5s linear infinite;"></div>
 </div>
 
@@ -14,23 +14,29 @@
 </style>
 
 <script>
-  let seconds = 15;
-  const btn = document.getElementById("timerButton");
-  const text = document.getElementById("countdownText");
-  const redirectURL = "https://your-link-here.com"; // ← এখানে আপনার লিংক দিন
+  document.addEventListener('DOMContentLoaded', function () {
+    var seconds = 15;
+    var secSpan = document.getElementById("sec");
+    var btn = document.getElementById("timerButton");
+    var text = document.getElementById("countdownText");
+    var redirectURL = "https://your-link-here.com"; // ← এখানে আপনার লিংক দিন
 
-  const timer = setInterval(() => {
-    seconds--;
-    if (seconds > 0) {
-      text.innerText = `Please wait ${seconds} seconds...`;
-    } else {
-      clearInterval(timer);
-      text.innerText = "Your reward is ready!";
-      btn.disabled = false;
-      btn.innerText = "🎁 Claim Now";
-      btn.style.cursor = "pointer";
-      btn.style.background = "#00e676";
-      btn.onclick = () => window.location.href = redirectURL;
-    }
-  }, 1000);
+    var interval = setInterval(function () {
+      seconds--;
+      if (seconds > 0) {
+        secSpan.innerText = seconds;
+      } else {
+        clearInterval(interval);
+        text.innerText = "🎉 Now click the button below to continue:";
+        btn.disabled = false;
+        btn.innerText = "👉 Click to Proceed";
+        btn.style.cursor = "pointer";
+        btn.style.background = "#00e676";
+        // ✅ Only manual click triggers redirect
+        btn.onclick = function () {
+          window.location.href = redirectURL;
+        };
+      }
+    }, 1000);
+  });
 </script>
