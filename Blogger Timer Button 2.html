@@ -1,52 +1,52 @@
-<!-- ✅ বাংলা টাইমার উইন্ডোজ স্টাইল -->
+<!-- ✅ English Countdown Timer (Small + Clean) -->
 <div class="timer-card">
-  <p class="timer-text">⏳ অনুগ্রহ করে অপেক্ষা করুন <span id="sec">১৫</span> সেকেন্ড</p>
+  <p class="timer-text">⏳ Please wait <span id="sec">15</span> seconds</p>
   <div class="progress-container">
     <div id="progressBar" class="progress-bar"></div>
   </div>
-  <button id="timerButton" disabled class="timer-button">লোড হচ্ছে...</button>
+  <button id="timerButton" disabled class="timer-button">Loading...</button>
 </div>
 
 <style>
 .timer-card {
-  max-width: 360px;
+  max-width: 320px;
   margin: 30px auto;
-  padding: 18px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #141E30, #243B55);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-  color: #fff;
-  font-family: 'Noto Sans Bengali', sans-serif;
+  padding: 16px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  color: #333;
+  font-family: 'Segoe UI', sans-serif;
   text-align: center;
 }
 .timer-text {
-  margin: 0 0 8px;
-  font-size: 15px;
+  margin: 0 0 10px;
+  font-size: 14px;
 }
 .progress-container {
-  width: 80%;
+  width: 85%;
   height: 6px;
-  background: #ffffff30;
+  background: #eee;
   border-radius: 4px;
-  margin: 10px auto;
+  margin: 12px auto;
   overflow: hidden;
 }
 .progress-bar {
   height: 100%;
   width: 0%;
-  background: #00e676;
+  background: #28a745;
   transition: width 1s;
 }
 .timer-button {
-  padding: 6px 16px;
-  font-size: 14px;
-  background: #ffffff20;
-  border: 1px solid #fff;
-  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 13px;
+  background: #ccc;
+  border: none;
+  border-radius: 18px;
   color: #fff;
   cursor: not-allowed;
   margin-top: 10px;
-  transition: all 0.3s;
+  transition: 0.3s;
 }
 </style>
 
@@ -56,28 +56,23 @@
     const sec = document.getElementById("sec"),
           btn = document.getElementById("timerButton"),
           bar = document.getElementById("progressBar"),
-          link = "https://your-link-here.com"; // ← এখানে আপনার লিংক দিন
+          link = "https://your-link-here.com"; // ← Set your link here
 
     const timer = setInterval(() => {
       seconds--;
-      sec.textContent = convertToBanglaNumber(seconds);
+      sec.textContent = seconds;
       bar.style.width = ((max - seconds) / max * 100) + "%";
+
       if (seconds <= 0) {
         clearInterval(timer);
-        sec.textContent = "০";
+        sec.textContent = "0";
         btn.disabled = false;
-        btn.textContent = "👉 এখানে ক্লিক করুন";
-        btn.style.background = "#00e676";
-        btn.style.color = "#000";
+        btn.textContent = "👉 Click to continue";
+        btn.style.background = "#28a745";
+        btn.style.color = "#fff";
         btn.style.cursor = "pointer";
         btn.onclick = () => window.location.href = link;
       }
     }, 1000);
-
-    // 🔁 English → Bangla digit converter
-    function convertToBanglaNumber(number) {
-      const bnDigits = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
-      return number.toString().split('').map(d => bnDigits[+d] || d).join('');
-    }
   });
 </script>
