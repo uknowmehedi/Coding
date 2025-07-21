@@ -1,52 +1,55 @@
-<!-- ✅ English Countdown Timer (Small + Clean) -->
-<div class="timer-card">
-  <p class="timer-text">⏳ Please wait <span id="sec">15</span> seconds</p>
-  <div class="progress-container">
-    <div id="progressBar" class="progress-bar"></div>
+<!-- ✅ Compact Countdown Timer with Windows Blue Progress -->
+<div class="timer-box">
+  <p class="timer-text">⏳ Wait <span id="sec">15</span> sec</p>
+  <div class="progress-track">
+    <div id="progressBar" class="progress-fill"></div>
   </div>
-  <button id="timerButton" disabled class="timer-button">Loading...</button>
+  <button id="timerButton" disabled class="timer-btn">Loading...</button>
 </div>
 
 <style>
-.timer-card {
-  max-width: 320px;
-  margin: 30px auto;
-  padding: 16px;
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  color: #333;
-  font-family: 'Segoe UI', sans-serif;
+.timer-box {
+  max-width: 260px;
+  margin: 20px auto;
+  padding: 14px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
+  font-family: Arial, sans-serif;
+  color: #333;
 }
 .timer-text {
-  margin: 0 0 10px;
-  font-size: 14px;
+  font-size: 13px;
+  margin-bottom: 8px;
 }
-.progress-container {
-  width: 85%;
-  height: 6px;
+.progress-track {
+  width: 90%;
+  height: 5px;
   background: #eee;
-  border-radius: 4px;
-  margin: 12px auto;
+  border-radius: 3px;
+  margin: 8px auto;
   overflow: hidden;
 }
-.progress-bar {
+.progress-fill {
   height: 100%;
   width: 0%;
-  background: #28a745;
-  transition: width 1s;
+  background: #0078D7; /* Windows pure blue */
+  transition: width 1s linear;
 }
-.timer-button {
-  padding: 5px 12px;
-  font-size: 13px;
-  background: #ccc;
+.timer-btn {
+  padding: 4px 10px;
+  font-size: 12px;
   border: none;
-  border-radius: 18px;
+  border-radius: 14px;
+  background: #bbb;
   color: #fff;
   cursor: not-allowed;
-  margin-top: 10px;
   transition: 0.3s;
+}
+.timer-btn.enabled {
+  background: #0078D7;
+  cursor: pointer;
 }
 </style>
 
@@ -56,7 +59,7 @@
     const sec = document.getElementById("sec"),
           btn = document.getElementById("timerButton"),
           bar = document.getElementById("progressBar"),
-          link = "https://your-link-here.com"; // ← Set your link here
+          link = "https://your-link-here.com"; // ← Replace with your link
 
     const timer = setInterval(() => {
       seconds--;
@@ -67,10 +70,8 @@
         clearInterval(timer);
         sec.textContent = "0";
         btn.disabled = false;
-        btn.textContent = "👉 Click to continue";
-        btn.style.background = "#28a745";
-        btn.style.color = "#fff";
-        btn.style.cursor = "pointer";
+        btn.textContent = "👉 Go";
+        btn.classList.add("enabled");
         btn.onclick = () => window.location.href = link;
       }
     }, 1000);
