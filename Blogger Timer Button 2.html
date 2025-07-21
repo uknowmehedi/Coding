@@ -1,38 +1,41 @@
-<!-- ✅ Blogger-Compatible Countdown Card (Manual Click Only) -->
-<div style="max-width:420px;margin:30px auto;padding:20px;border-radius:16px;background:linear-gradient(135deg, #6a11cb, #2575fc);box-shadow:0 8px 20px rgba(0,0,0,0.2);color:#fff;position:relative;overflow:hidden;font-family:sans-serif;text-align:center;">
-  <div style="font-size:24px;margin-bottom:10px;">⏳ Limited Time Offer</div>
-  <p id="countdownText" style="font-size:16px;margin-bottom:20px;">Please wait <span id="sec">15</span> seconds...</p>
-  <button id="timerButton" disabled style="padding:12px 28px;font-size:16px;background:#ffffff40;border:2px solid #fff;border-radius:50px;color:#fff;cursor:not-allowed;transition:0.3s;">Loading...</button>
-  <div style="position:absolute;top:0;left:0;width:100%;height:100%;border:3px dashed rgba(255,255,255,0.3);border-radius:16px;box-sizing:border-box;animation:borderRotate 5s linear infinite;"></div>
-</div>
+<!-- ✅ Countdown with Progress Animation + Small Button -->
+<div style="max-width:400px;margin:30px auto;padding:20px;border-radius:16px;background:linear-gradient(135deg, #141E30, #243B55);box-shadow:0 8px 20px rgba(0,0,0,0.3);color:#fff;font-family:sans-serif;text-align:center;position:relative;">
+  <div style="font-size:20px;margin-bottom:10px;">⏳ লোডিং চলছে...</div>
+  <p style="font-size:14px;margin-bottom:10px;">অনুগ্রহ করে অপেক্ষা করুন <span id="sec">15</span> সেকেন্ড</p>
 
-<style>
-@keyframes borderRotate {
-  0% {transform: rotate(0deg);}
-  100% {transform: rotate(360deg);}
-}
-</style>
+  <!-- Progress Bar -->
+  <div style="width:80%;height:8px;background:#ffffff30;border-radius:4px;margin:10px auto;overflow:hidden;">
+    <div id="progressBar" style="height:100%;width:0%;background:#00e676;transition:width 1s;"></div>
+  </div>
+
+  <!-- Small Button -->
+  <button id="timerButton" disabled style="padding:6px 16px;font-size:14px;background:#ffffff20;border:1px solid #fff;border-radius:30px;color:#fff;cursor:not-allowed;margin-top:10px;transition:0.3s;">Loading...</button>
+</div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     var seconds = 15;
+    var max = 15;
     var secSpan = document.getElementById("sec");
     var btn = document.getElementById("timerButton");
-    var text = document.getElementById("countdownText");
+    var progress = document.getElementById("progressBar");
     var redirectURL = "https://your-link-here.com"; // ← এখানে আপনার লিংক দিন
 
     var interval = setInterval(function () {
       seconds--;
+      var percent = Math.floor(((max - seconds) / max) * 100);
+      progress.style.width = percent + "%";
       if (seconds > 0) {
         secSpan.innerText = seconds;
       } else {
         clearInterval(interval);
-        text.innerText = "🎉 Now click the button below to continue:";
+        secSpan.innerText = "0";
         btn.disabled = false;
-        btn.innerText = "👉 Click to Proceed";
+        btn.innerText = "👉 ক্লিক করুন";
         btn.style.cursor = "pointer";
         btn.style.background = "#00e676";
-        // ✅ Only manual click triggers redirect
+        btn.style.color = "#000";
+        btn.style.fontWeight = "bold";
         btn.onclick = function () {
           window.location.href = redirectURL;
         };
