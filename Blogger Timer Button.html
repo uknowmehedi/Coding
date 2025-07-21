@@ -1,0 +1,28 @@
+<!-- ✅ Timer Card HTML + CSS + JS -->
+<div style="max-width:400px;margin:30px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1);text-align:center;font-family:sans-serif;">
+  <h3 style="margin-bottom:15px;color:#333;">🎁 Unlock Your Gift</h3>
+  <p id="countdownText" style="font-size:16px;color:#666;">Please wait 15 seconds...</p>
+  <button id="timerButton" disabled style="padding:10px 25px;font-size:16px;background:#888;color:#fff;border:none;border-radius:8px;cursor:not-allowed;margin-top:10px;">Please wait...</button>
+</div>
+
+<script>
+  let timeLeft = 15;
+  const countdownText = document.getElementById("countdownText");
+  const button = document.getElementById("timerButton");
+  const redirectURL = "https://your-link-here.com"; // ⬅️ এখানে আপনার লিংক দিন
+
+  const timer = setInterval(() => {
+    timeLeft--;
+    if (timeLeft > 0) {
+      countdownText.innerText = `Please wait ${timeLeft} seconds...`;
+    } else {
+      clearInterval(timer);
+      countdownText.innerText = "Now you can claim it!";
+      button.innerText = "Click Here";
+      button.disabled = false;
+      button.style.background = "#28a745";
+      button.style.cursor = "pointer";
+      button.onclick = () => window.location.href = redirectURL;
+    }
+  }, 1000);
+</script>
