@@ -1,43 +1,34 @@
-<!-- ✅ Timer Card with Windows-style Progress Animation -->
-<div style="max-width:400px;margin:30px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1);text-align:center;font-family:sans-serif;">
-  <h3 style="margin-bottom:15px;color:#333;">🎁 Unlock Your Gift</h3>
-  <p id="countdownText" style="font-size:16px;color:#666;">Please wait <span id="sec">15</span> seconds...</p>
-
-  <!-- Progress Bar -->
-  <div style="width:80%;height:10px;background:#ddd;border-radius:5px;margin:15px auto;overflow:hidden;">
-    <div id="progressBar" style="height:100%;width:0%;background:#28a745;transition:width 1s;"></div>
+<!-- ✅ 15 সেকেন্ড টাইমার উইন্ডোজ স্টাইল -->
+<div style="max-width:360px;margin:30px auto;padding:18px;border-radius:14px;background:linear-gradient(135deg,#141E30,#243B55);box-shadow:0 6px 16px rgba(0,0,0,0.3);color:#fff;font-family:sans-serif;text-align:center;">
+  <p style="margin:0 0 8px;font-size:15px;">⏳ অনুগ্রহ করে অপেক্ষা করুন <span id="sec">15</span> সেকেন্ড</p>
+  <div style="width:80%;height:6px;background:#ffffff30;border-radius:4px;margin:10px auto;">
+    <div id="progressBar" style="height:100%;width:0%;background:#00e676;transition:width 1s;"></div>
   </div>
-
-  <button id="timerButton" disabled style="padding:10px 25px;font-size:16px;background:#888;color:#fff;border:none;border-radius:8px;cursor:not-allowed;margin-top:10px;">Please wait...</button>
+  <button id="timerButton" disabled style="padding:5px 14px;font-size:13px;background:#ffffff20;border:1px solid #fff;border-radius:20px;color:#fff;cursor:not-allowed;margin-top:8px;">লোড হচ্ছে...</button>
 </div>
 
 <script>
-  let timeLeft = 15;
-  const totalTime = timeLeft;
-  const countdownText = document.getElementById("countdownText");
-  const secSpan = document.getElementById("sec");
-  const button = document.getElementById("timerButton");
-  const progressBar = document.getElementById("progressBar");
-  const redirectURL = "https://your-link-here.com"; // ⬅️ এখানে আপনার লিংক দিন
+  document.addEventListener('DOMContentLoaded', () => {
+    let seconds = 15, max = 15;
+    const sec = document.getElementById("sec"),
+          btn = document.getElementById("timerButton"),
+          bar = document.getElementById("progressBar"),
+          link = "https://your-link-here.com"; // ← এখানে আপনার লিংক দিন
 
-  const timer = setInterval(() => {
-    timeLeft--;
-
-    // Update seconds display
-    secSpan.innerText = timeLeft;
-
-    // Update progress bar
-    const progress = ((totalTime - timeLeft) / totalTime) * 100;
-    progressBar.style.width = progress + "%";
-
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      countdownText.innerText = "✅ Now you can claim it!";
-      button.innerText = "Click Here";
-      button.disabled = false;
-      button.style.background = "#28a745";
-      button.style.cursor = "pointer";
-      button.onclick = () => window.location.href = redirectURL;
-    }
-  }, 1000);
+    const timer = setInterval(() => {
+      seconds--;
+      sec.textContent = seconds;
+      bar.style.width = ((max - seconds) / max * 100) + "%";
+      if (seconds <= 0) {
+        clearInterval(timer);
+        sec.textContent = "0";
+        btn.disabled = false;
+        btn.textContent = "👉 ক্লিক করুন";
+        btn.style.background = "#00e676";
+        btn.style.color = "#000";
+        btn.style.cursor = "pointer";
+        btn.onclick = () => window.location.href = link;
+      }
+    }, 1000);
+  });
 </script>
