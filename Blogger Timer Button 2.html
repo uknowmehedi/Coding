@@ -1,6 +1,6 @@
-<!-- ✅ 15 সেকেন্ড টাইমার উইন্ডোজ স্টাইল -->
+<!-- ✅ বাংলা টাইমার উইন্ডোজ স্টাইল -->
 <div class="timer-card">
-  <p class="timer-text">⏳ অনুগ্রহ করে অপেক্ষা করুন <span id="sec">15</span> সেকেন্ড</p>
+  <p class="timer-text">⏳ অনুগ্রহ করে অপেক্ষা করুন <span id="sec">১৫</span> সেকেন্ড</p>
   <div class="progress-container">
     <div id="progressBar" class="progress-bar"></div>
   </div>
@@ -16,7 +16,7 @@
   background: linear-gradient(135deg, #141E30, #243B55);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
   color: #fff;
-  font-family: sans-serif;
+  font-family: 'Noto Sans Bengali', sans-serif;
   text-align: center;
 }
 .timer-text {
@@ -38,14 +38,14 @@
   transition: width 1s;
 }
 .timer-button {
-  padding: 5px 14px;
-  font-size: 13px;
+  padding: 6px 16px;
+  font-size: 14px;
   background: #ffffff20;
   border: 1px solid #fff;
   border-radius: 20px;
   color: #fff;
   cursor: not-allowed;
-  margin-top: 8px;
+  margin-top: 10px;
   transition: all 0.3s;
 }
 </style>
@@ -60,18 +60,24 @@
 
     const timer = setInterval(() => {
       seconds--;
-      sec.textContent = seconds;
+      sec.textContent = convertToBanglaNumber(seconds);
       bar.style.width = ((max - seconds) / max * 100) + "%";
       if (seconds <= 0) {
         clearInterval(timer);
-        sec.textContent = "0";
+        sec.textContent = "০";
         btn.disabled = false;
-        btn.textContent = "👉 ক্লিক করুন";
+        btn.textContent = "👉 এখানে ক্লিক করুন";
         btn.style.background = "#00e676";
         btn.style.color = "#000";
         btn.style.cursor = "pointer";
         btn.onclick = () => window.location.href = link;
       }
     }, 1000);
+
+    // 🔁 English → Bangla digit converter
+    function convertToBanglaNumber(number) {
+      const bnDigits = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+      return number.toString().split('').map(d => bnDigits[+d] || d).join('');
+    }
   });
 </script>
