@@ -1,32 +1,30 @@
 <!-- ✅ Timer Card with Windows-style Progress Animation -->
 <div style="max-width:400px;margin:30px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1);text-align:center;font-family:sans-serif;">
   <h3 style="margin-bottom:15px;color:#333;">🎁 Unlock Your Gift</h3>
-  <p id="countdownText" style="font-size:16px;color:#666;">Please wait <span id="time">15</span> seconds...</p>
+  <p id="countdownText" style="font-size:16px;color:#666;">Please wait <span id="sec">15</span> seconds...</p>
 
   <!-- Progress Bar -->
-  <div style="width:80%;height:8px;background:#e0e0e0;border-radius:4px;margin:10px auto;overflow:hidden;">
+  <div style="width:80%;height:10px;background:#ddd;border-radius:5px;margin:15px auto;overflow:hidden;">
     <div id="progressBar" style="height:100%;width:0%;background:#28a745;transition:width 1s;"></div>
   </div>
 
-  <!-- Button -->
-  <button id="timerButton" disabled style="padding:8px 20px;font-size:15px;background:#888;color:#fff;border:none;border-radius:8px;cursor:not-allowed;margin-top:10px;">Please wait...</button>
+  <button id="timerButton" disabled style="padding:10px 25px;font-size:16px;background:#888;color:#fff;border:none;border-radius:8px;cursor:not-allowed;margin-top:10px;">Please wait...</button>
 </div>
 
 <script>
   let timeLeft = 15;
-  const countdownText = document.getElementById("countdownText");
-  const timeSpan = document.getElementById("time");
-  const progressBar = document.getElementById("progressBar");
-  const button = document.getElementById("timerButton");
-  const redirectURL = "https://your-link-here.com"; // ⬅️ এখানে আপনার লিংক দিন
-
   const totalTime = timeLeft;
+  const countdownText = document.getElementById("countdownText");
+  const secSpan = document.getElementById("sec");
+  const button = document.getElementById("timerButton");
+  const progressBar = document.getElementById("progressBar");
+  const redirectURL = "https://your-link-here.com"; // ⬅️ এখানে আপনার লিংক দিন
 
   const timer = setInterval(() => {
     timeLeft--;
 
-    // Update time text
-    timeSpan.innerText = timeLeft;
+    // Update seconds display
+    secSpan.innerText = timeLeft;
 
     // Update progress bar
     const progress = ((totalTime - timeLeft) / totalTime) * 100;
@@ -35,7 +33,7 @@
     if (timeLeft <= 0) {
       clearInterval(timer);
       countdownText.innerText = "✅ Now you can claim it!";
-      button.innerText = "👉 Click Here";
+      button.innerText = "Click Here";
       button.disabled = false;
       button.style.background = "#28a745";
       button.style.cursor = "pointer";
