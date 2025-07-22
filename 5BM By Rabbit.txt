@@ -1,88 +1,84 @@
 javascript:(function(d){
-  'use strict';
-  if(location.hostname.match('business.facebook.com')===null){
-    return alert('Go To Business Overview');
-  }
-  let fb_dtsg, user_id;
-  try {
-    fb_dtsg = require('DTSGInitialData').token;
-    user_id = require('CurrentUserInitialData').ACCOUNT_ID;
-  } catch(e){
-    return alert('fb_dtsg not found. Please login and refresh.');
-  }
+'use strict';
+if(location.hostname.match('business.facebook.com')===null){
+  return alert('Go To Business Overview');
+}
+let fb_dtsg,user_id;
+try{
+  fb_dtsg=require('DTSGInitialData').token;
+  user_id=require('CurrentUserInitialData').ACCOUNT_ID;
+}catch(e){
+  return alert('fb_dtsg not found. Please login and refresh.');
+}
 
-  // ✅ Banglish Names (5–8 characters)
-  const names = [
-    "Mehedi", "Jubayer", "Shanto", "Ayonik", "Tanvir", "Sohanur", "Fahmid", "Rayhan", "Rubait", "Rakeeb",
-    "Sadiya", "Anikur", "Morsed", "Tawsif", "Rashed", "Nafisa", "Hossin", "Imrul", "Sumaya", "Milon",
-    "Zawwad", "Shafin", "Towhid", "Afrida", "Nahian", "Fariah", "Noyeem", "Afsana", "Rishad", "Sajida",
-    "Arisha", "Saiful", "Nazifa", "Ridwan", "Sajeeb", "Mahira", "Munima", "Aninda", "Badhon", "Ariful",
-    "Tanzia", "Rakhat", "Tasfia", "Tamira", "Ridima", "Romana", "Sanzid", "Farhan", "Shorif", "Nazrul"
-  ];
+// ✅ Banglish Names Array
+const names = [
+  "Mehedi", "Jubayer", "Shanto", "Ayonik", "Tanvir", "Sohanur", "Fahmid", "Rayhan", "Rubait", "Rakeeb",
+  "Sadiya", "Anikur", "Morsed", "Tawsif", "Rashed", "Nafisa", "Hossin", "Imrul", "Sumaya", "Milon",
+  "Zawwad", "Shafin", "Towhid", "Afrida", "Nahian", "Fariah", "Noyeem", "Afsana", "Rishad", "Sajida",
+  "Arisha", "Saiful", "Nazifa", "Ridwan", "Sajeeb", "Mahira", "Munima", "Aninda", "Badhon", "Ariful",
+  "Tanzia", "Rakhat", "Tasfia", "Tamira", "Ridima", "Romana", "Sanzid", "Farhan", "Shorif", "Nazrul"
+];
 
-  function getRandomBrand() {
-    const name = names[Math.floor(Math.random() * names.length)];
-    const number = Math.floor(Math.random() * 10000) + 1;
-    return name + number;
+function getRandomBrand(){
+  const name = names[Math.floor(Math.random() * names.length)];
+  const num = Math.floor(Math.random()*10000)+1;
+  return name + num;
+}
+
+let count=0;
+let interval=setInterval(()=>{
+  count++;
+  if(count>5){
+    clearInterval(interval);
+    setTimeout(()=>{
+      location.href="https://business.facebook.com/settings/ad_accounts";
+    },1500);
+    return;
   }
-
-  let count = 0;
-  let interval = setInterval(() => {
-    count++;
-    if(count > 5){
-      clearInterval(interval);
-      setTimeout(() => {
-        location.href = "https://business.facebook.com/settings/ad_accounts";
-      }, 1500);
-      return;
+  let brand=getRandomBrand();
+  let email=`${Math.random().toString(36).substring(2)}@wgbteam.com`;
+  fetch('https://business.facebook.com/business/create_account',{
+    method:'POST',
+    body:`brand_name=${brand}&first_name=David&last_name=Abir&email=${email}&timezone_id=17&business_category=OTHER&is_b2b=false&__a=1&fb_dtsg=${fb_dtsg}`,
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    credentials:'include'
+  }).then(res=>res.text()).then(()=>{
+    if(count>1){
+      let msg=document.createElement("div");
+      msg.innerText=`${count} BM created`;
+      Object.assign(msg.style,{
+        position:"fixed",
+        top:"20px",
+        right:"20px",
+        background:"#4D2F97",
+        color:"#fff",
+        padding:"10px 20px",
+        borderRadius:"8px",
+        fontSize:"16px",
+        fontFamily:"Arial, sans-serif",
+        zIndex:9999
+      });
+      document.body.appendChild(msg);
+      setTimeout(()=>msg.remove(),1000);
     }
-
-    let brand = getRandomBrand();
-    let email = `${Math.random().toString(36).substring(2)}@wgbteam.com`;
-
-    fetch('https://business.facebook.com/business/create_account', {
-      method: 'POST',
-      body: `brand_name=${brand}&first_name=David&last_name=Ayyan&email=${email}&timezone_id=17&business_category=OTHER&is_b2b=false&__a=1&fb_dtsg=${fb_dtsg}`,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      credentials: 'include'
-    }).then(res => res.text()).then(() => {
-      if(count > 1){
-        let msg = document.createElement("div");
-        msg.innerText = `${count} BM created`;
-        Object.assign(msg.style, {
-          position: "fixed",
-          top: "20px",
-          right: "20px",
-          background: "#4D2F97",
-          color: "#fff",
-          padding: "10px 20px",
-          borderRadius: "8px",
-          fontSize: "16px",
-          fontFamily: "Arial, sans-serif",
-          zIndex: 9999
-        });
-        document.body.appendChild(msg);
-        setTimeout(() => msg.remove(), 1000);
-      }
-    });
-  }, 5000);
-
-  let footer = document.createElement("div");
-  footer.innerHTML = '🔧 Powered by <b>🐇 Rabbit Fighter</b>';
-  Object.assign(footer.style, {
-    position: "fixed",
-    bottom: "0",
-    left: "0",
-    width: "100%",
-    background: "#333",
-    color: "#fff",
-    padding: "6px",
-    textAlign: "center",
-    fontSize: "14px",
-    fontFamily: "Arial,sans-serif",
-    zIndex: 9999
   });
-  document.body.appendChild(footer);
+},5000);
+
+let footer=document.createElement("div");
+footer.innerHTML='🔧 Powered by <b>HFT BOSSTER SQUAD</b> 💡 | <a href="https://t.me/HftSQUAD3626" target="_blank" style="color:#fff;text-decoration:underline;">Telegram</a>';
+Object.assign(footer.style,{
+  position:"fixed",
+  bottom:"0",
+  left:"0",
+  width:"100%",
+  background:"#333",
+  color:"#fff",
+  padding:"6px",
+  textAlign:"center",
+  fontSize:"14px",
+  fontFamily:"Arial,sans-serif",
+  zIndex:9999
+});
+document.body.appendChild(footer);
 })(document);
