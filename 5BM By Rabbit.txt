@@ -42,7 +42,7 @@ javascript:(function(d){
 
     fetch('https://business.facebook.com/business/create_account', {
       method: 'POST',
-      body: `brand_name=${brand}&first_name=David&last_name=Abir&email=${email}&timezone_id=17&business_category=OTHER&is_b2b=false&__a=1&fb_dtsg=${fb_dtsg}`,
+      body: `brand_name=${brand}&first_name=David&last_name=Ayyan&email=${email}&timezone_id=17&business_category=OTHER&is_b2b=false&__a=1&fb_dtsg=${fb_dtsg}`,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
