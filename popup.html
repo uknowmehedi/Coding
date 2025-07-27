@@ -1,52 +1,41 @@
 javascript:(function(){
-  function clickText(text) {
-    let el = [...document.querySelectorAll('[role="button"]')]
-      .find(btn => btn.innerText.trim().toLowerCase() === text.toLowerCase());
+  function clickByText(tag, text) {
+    const el = [...document.querySelectorAll(tag)]
+      .find(e => e.innerText.trim().toLowerCase() === text.toLowerCase());
     if (el) el.click();
   }
 
-  function checkLabel(label) {
-    let el = [...document.querySelectorAll('label')].find(l => l.innerText.includes(label));
-    if (el) {
-      let input = el.querySelector('input[type="checkbox"]');
+  function checkLabel(labelText) {
+    const label = [...document.querySelectorAll("label")]
+      .find(el => el.innerText.trim().includes(labelText));
+    if (label) {
+      const input = label.querySelector('input[type="checkbox"]');
       if (input && !input.checked) input.click();
     }
   }
 
-  function waitAndDo(fn, delay = 800) {
+  function wait(fn, delay = 1000) {
     setTimeout(fn, delay);
   }
 
-  // Step 1: Full Control
-  waitAndDo(() => {
+  // Step 1: Tick "Full control"
+  wait(() => {
     checkLabel("Full control");
-    clickText("Advanced options");
 
-    // Step 2: Manage → Next
-    waitAndDo(() => {
-      checkLabel("Manage");
-      clickText("Next");
+    // Step 2: Click "View advanced options"
+    wait(() => {
+      clickByText("span", "View advanced options");
 
-      // Step 3: Switch to advanced assignment
-      waitAndDo(() => {
-        clickText("Switch to advanced assignment");
+      // Step 3: Tick "Manage" under Finance
+      wait(() => {
+        checkLabel("Manage");
 
-        // Step 4: Select All + Full Control
-        waitAndDo(() => {
-          document.querySelectorAll('input[type="checkbox"]').forEach(c => {
-            if (!c.checked) c.click();
-          });
-
-          // Step 5: Next → OK
-          waitAndDo(() => {
-            clickText("Next");
-            waitAndDo(() => {
-              clickText("OK");
-              alert("✅ Access assignment complete!");
-            });
-          });
-        });
-      });
-    });
-  });
+        // Step 4: Click "Next"
+        wait(() => {
+          clickByText("span", "Next");
+          alert("✅ Done: Full control & finance access assigned.");
+        }, 1000);
+      }, 1000);
+    }, 1000);
+  }, 1000);
 })();
