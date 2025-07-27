@@ -3,93 +3,63 @@ javascript:(function(){
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  async function runAutomation() {
-    const email = prompt("✉️ Enter email to invite:");
-    if (!email) {
-      alert("❌ No email entered.");
+  async function run() {
+    const email = prompt("Enter Email to Invite:");
+    if (!email) return;
+
+    function setInputValue(input, value) {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(input, value);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function clickByText(text) {
+      const el = Array.from(document.querySelectorAll("button, div[role='button'], div[role='radio'], div[role='checkbox']"))
+        .find(e => e.innerText.trim().toLowerCase() === text.toLowerCase());
+      if (el) el.click();
+    }
+
+    // STEP 1: Insert Email
+    let inputBox = Array.from(document.querySelectorAll("input[type='text'], input[type='email']"))
+      .find(i => i.outerHTML.includes("Notifications from the business") || i.ariaLabel?.toLowerCase().includes("email"));
+    if (inputBox) {
+      setInputValue(inputBox, email);
+    } else {
+      alert("❌ Email input not found");
       return;
     }
 
-    // Input email with React-compatible method
-    const tryInputEmail = () => {
-      const inputs = Array.from(document.querySelectorAll("input"));
-      for (let input of inputs) {
-        const placeholder = input.getAttribute("placeholder") || "";
-        const labelText = input.closest("label")?.innerText?.toLowerCase() || "";
-        if (
-          placeholder.toLowerCase().includes("email") ||
-          labelText.includes("email address") ||
-          input.outerHTML.includes("Notifications from the business")
-        ) {
-          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-          nativeInputValueSetter?.call(input, email);
-          input.dispatchEvent(new Event('input', { bubbles: true }));
-          return true;
-        }
-      }
-      return false;
-    };
+    await sleep(800);
 
-    const tryClickByText = (label) => {
-      const all = Array.from(document.querySelectorAll("button, div[role='button']"));
-      const found = all.find(el => el.innerText.trim().toLowerCase() === label.toLowerCase());
-      if (found) {
-        found.click();
-        return true;
-      }
-      return false;
-    };
+    // STEP 2: Uncheck Temporary Access
+    const tempLabel = Array.from(document.querySelectorAll("label")).find(l => l.innerText.toLowerCase().includes("temporary access"));
+    if (tempLabel) {
+      const checkbox = tempLabel.querySelector("input[type='checkbox']");
+      if (checkbox?.checked) tempLabel.click();
+    }
 
-    const tryUncheckTempAccess = () => {
-      const labels = Array.from(document.querySelectorAll("label"));
-      const checkboxLabel = labels.find(l => l.innerText.toLowerCase().includes("temporary access"));
-      if (checkboxLabel) {
-        const checkbox = checkboxLabel.querySelector("input[type='checkbox']");
-        if (checkbox?.checked) {
-          checkboxLabel.click();
-        }
-      }
-    };
-
-    const tryClickManage = () => {
-      const all = Array.from(document.querySelectorAll("div[role='checkbox'], div[role='radio'], div[role='button']"));
-      all.forEach(el => {
-        const text = el.innerText.trim().toLowerCase();
-        if (text === "manage" || text === "full control") {
-          el.click();
-        }
-      });
-    };
-
-    const tryAdvancedOptions = async () => {
-      tryClickByText("view advanced options");
-      await sleep(600);
-      tryClickManage(); // Click manage under finance
-    };
-
-    tryInputEmail();
-    await sleep(1000);
-
-    tryUncheckTempAccess();
-    await sleep(700);
-
-    tryClickByText("next");
+    await sleep(600);
+    clickByText("Next");
     await sleep(1200);
 
-    tryClickManage();
-    await sleep(600);
+    // STEP 3: Assign Access
+    clickByText("Manage");
+    await sleep(800);
 
-    await tryAdvancedOptions();
-    await sleep(700);
+    clickByText("View advanced options");
+    await sleep(800);
 
-    tryClickByText("next");
+    clickByText("Manage"); // Finance
+    await sleep(800);
+
+    clickByText("Next");
     await sleep(1000);
 
-    tryClickByText("send invitation");
+    clickByText("Send invitation");
     await sleep(1000);
 
-    tryClickByText("ok");
+    clickByText("OK");
   }
 
-  runAutomation();
+  run();
 })();
