@@ -1,1 +1,1 @@
-// Content script placeholder
+// Background script placeholder
