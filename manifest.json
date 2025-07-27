@@ -1,22 +1,20 @@
 {
   "manifest_version": 3,
-  "name": "Meta Business Auto Invite",
-  "version": "1.0",
-  "description": "Auto invite email to Meta Business Manager with full permission",
-  "permissions": ["scripting", "activeTab"],
+  "name": "Meta Invite Auto Flow",
+  "version": "3.2",
+  "description": "Inject email and auto complete Meta Business invite steps.",
+  "permissions": ["scripting", "activeTab", "tabs"],
   "action": {
     "default_popup": "popup.html",
-    "default_icon": {
-      "16": "icon.png"
-    }
+    "default_icon": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["https://business.facebook.com/latest/settings/business_users*"],
-      "js": ["content.js"]
+      "matches": ["https://business.facebook.com/*"],
+      "js": ["scripts/content.js"]
     }
-  ],
-  "background": {
-    "service_worker": "background.js"
-  }
+  ]
 }
