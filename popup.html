@@ -1,13 +1,11 @@
 javascript:(function(){
   function clickByText(tag, text) {
-    const el = [...document.querySelectorAll(tag)]
-      .find(e => e.innerText.trim().toLowerCase() === text.toLowerCase());
+    const el = [...document.querySelectorAll(tag)].find(e => e.innerText.trim().toLowerCase() === text.toLowerCase());
     if (el) el.click();
   }
 
-  function checkLabel(labelText) {
-    const label = [...document.querySelectorAll("label")]
-      .find(el => el.innerText.trim().includes(labelText));
+  function checkManageByLabel(labelText) {
+    const label = [...document.querySelectorAll("label")].find(el => el.innerText.includes(labelText));
     if (label) {
       const input = label.querySelector('input[type="checkbox"]');
       if (input && !input.checked) input.click();
@@ -18,22 +16,22 @@ javascript:(function(){
     setTimeout(fn, delay);
   }
 
-  // Step 1: Tick "Full control"
+  // Step 1: Tick Partial Access > Manage
   wait(() => {
-    checkLabel("Full control");
-
+    checkManageByLabel("Apps and integrations");
+    
     // Step 2: Click "View advanced options"
     wait(() => {
       clickByText("span", "View advanced options");
 
-      // Step 3: Tick "Manage" under Finance
+      // Step 3: Tick Finance > Manage
       wait(() => {
-        checkLabel("Manage");
+        checkManageByLabel("Finance");
 
-        // Step 4: Click "Next"
+        // Step 4: Click Next
         wait(() => {
           clickByText("span", "Next");
-          alert("✅ Done: Full control & finance access assigned.");
+          alert("✅ Assign Access automation complete!");
         }, 1000);
       }, 1000);
     }, 1000);
