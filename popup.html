@@ -1,1 +1,52 @@
-javascript:(()=>{const email=prompt("Enter email to invite:");if(!email)return alert("No email entered!");const sleep=ms=>new Promise(r=>setTimeout(r,ms));const clickNext=()=>{const btns=[...document.querySelectorAll("span,button")];const next=btns.find(b=>b.innerText.trim().toLowerCase()==="next");if(next)next.click();};(async()=>{let foundInput=null;document.querySelectorAll('input[type="text"]').forEach(input=>{const label=input.closest("div");if(label&&label.textContent.toLowerCase().includes("notifications from the business"))foundInput=input;});if(!foundInput)return alert("⚠️ Email input field not found!");foundInput.focus();foundInput.value=email;foundInput.dispatchEvent(new Event("input",{bubbles:true}));await sleep(500);document.body.click();await sleep(700);clickNext();})();})();
+javascript:(function(){
+  function clickText(text) {
+    let el = [...document.querySelectorAll('[role="button"]')]
+      .find(btn => btn.innerText.trim().toLowerCase() === text.toLowerCase());
+    if (el) el.click();
+  }
+
+  function checkLabel(label) {
+    let el = [...document.querySelectorAll('label')].find(l => l.innerText.includes(label));
+    if (el) {
+      let input = el.querySelector('input[type="checkbox"]');
+      if (input && !input.checked) input.click();
+    }
+  }
+
+  function waitAndDo(fn, delay = 800) {
+    setTimeout(fn, delay);
+  }
+
+  // Step 1: Full Control
+  waitAndDo(() => {
+    checkLabel("Full control");
+    clickText("Advanced options");
+
+    // Step 2: Manage → Next
+    waitAndDo(() => {
+      checkLabel("Manage");
+      clickText("Next");
+
+      // Step 3: Switch to advanced assignment
+      waitAndDo(() => {
+        clickText("Switch to advanced assignment");
+
+        // Step 4: Select All + Full Control
+        waitAndDo(() => {
+          document.querySelectorAll('input[type="checkbox"]').forEach(c => {
+            if (!c.checked) c.click();
+          });
+
+          // Step 5: Next → OK
+          waitAndDo(() => {
+            clickText("Next");
+            waitAndDo(() => {
+              clickText("OK");
+              alert("✅ Access assignment complete!");
+            });
+          });
+        });
+      });
+    });
+  });
+})();
