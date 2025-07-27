@@ -10,17 +10,20 @@ javascript:(function(){
       return;
     }
 
+    // Input email with React-compatible method
     const tryInputEmail = () => {
-      const inputs = Array.from(document.querySelectorAll("input[type='text'], input[type='email']"));
+      const inputs = Array.from(document.querySelectorAll("input"));
       for (let input of inputs) {
+        const placeholder = input.getAttribute("placeholder") || "";
+        const labelText = input.closest("label")?.innerText?.toLowerCase() || "";
         if (
-          input?.placeholder?.toLowerCase().includes("email") ||
-          input?.ariaLabel?.toLowerCase().includes("email") ||
-          input?.outerHTML?.includes("Notifications from the business")
+          placeholder.toLowerCase().includes("email") ||
+          labelText.includes("email address") ||
+          input.outerHTML.includes("Notifications from the business")
         ) {
-          input.focus();
-          input.value = email;
-          input.dispatchEvent(new Event("input", { bubbles: true }));
+          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          nativeInputValueSetter?.call(input, email);
+          input.dispatchEvent(new Event('input', { bubbles: true }));
           return true;
         }
       }
@@ -28,8 +31,8 @@ javascript:(function(){
     };
 
     const tryClickByText = (label) => {
-      const elements = Array.from(document.querySelectorAll("button, div[role='button']"));
-      const found = elements.find(el => el.innerText.trim().toLowerCase() === label.toLowerCase());
+      const all = Array.from(document.querySelectorAll("button, div[role='button']"));
+      const found = all.find(el => el.innerText.trim().toLowerCase() === label.toLowerCase());
       if (found) {
         found.click();
         return true;
@@ -49,43 +52,43 @@ javascript:(function(){
     };
 
     const tryClickManage = () => {
-      const buttons = Array.from(document.querySelectorAll("div[role='radio'], div[role='checkbox'], div[role='button']"));
-      buttons.forEach(btn => {
-        const text = btn.innerText.trim().toLowerCase();
+      const all = Array.from(document.querySelectorAll("div[role='checkbox'], div[role='radio'], div[role='button']"));
+      all.forEach(el => {
+        const text = el.innerText.trim().toLowerCase();
         if (text === "manage" || text === "full control") {
-          btn.click();
+          el.click();
         }
       });
     };
 
     const tryAdvancedOptions = async () => {
-      tryClickByText("View advanced options");
-      await sleep(500);
-      tryClickManage(); // Manage under Finance
+      tryClickByText("view advanced options");
+      await sleep(600);
+      tryClickManage(); // Click manage under finance
     };
 
     tryInputEmail();
-    await sleep(800);
+    await sleep(1000);
 
     tryUncheckTempAccess();
-    await sleep(500);
+    await sleep(700);
 
-    tryClickByText("Next");
-    await sleep(1000);
+    tryClickByText("next");
+    await sleep(1200);
 
-    tryClickManage(); // Full control
-    await sleep(500);
+    tryClickManage();
+    await sleep(600);
 
     await tryAdvancedOptions();
-    await sleep(800);
+    await sleep(700);
 
-    tryClickByText("Next");
+    tryClickByText("next");
     await sleep(1000);
 
-    tryClickByText("Send invitation");
+    tryClickByText("send invitation");
     await sleep(1000);
 
-    tryClickByText("OK");
+    tryClickByText("ok");
   }
 
   runAutomation();
