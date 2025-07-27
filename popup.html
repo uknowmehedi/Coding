@@ -1,25 +1,18 @@
-javascript:(function(){
+javascript:(async function(){
   function wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(res => setTimeout(res, ms));
   }
 
-  function clickTextContains(text) {
-    const el = [...document.querySelectorAll("span, div, button")]
-      .find(e => e.innerText && e.innerText.toLowerCase().includes(text.toLowerCase()));
-    if (el) {
-      el.click();
-      return true;
-    }
-    return false;
-  }
-
-  function checkInputByLabel(text) {
-    const labels = document.querySelectorAll('label');
-    for (const label of labels) {
-      if (label.innerText && label.innerText.toLowerCase().includes(text.toLowerCase())) {
-        const checkbox = label.querySelector('input[type="checkbox"]');
-        if (checkbox && !checkbox.checked) {
-          checkbox.click();
+  function setInputByLabel(labelText, value) {
+    const labels = [...document.querySelectorAll("label")];
+    for (let label of labels) {
+      if (label.innerText.toLowerCase().includes(labelText.toLowerCase())) {
+        const input = label.querySelector("input[type='text']");
+        if (input) {
+          input.focus();
+          input.value = value;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          console.log("✅ Email input filled.");
           return true;
         }
       }
@@ -27,33 +20,60 @@ javascript:(function(){
     return false;
   }
 
-  async function run() {
-    alert("🔄 Starting Assign Access Automation...");
-
-    // Step 1: Partial Access > Manage (Apps and Integrations)
-    checkInputByLabel("Apps and integrations");
-
-    await wait(800);
-
-    // Step 2: View Advanced Options
-    clickTextContains("view advanced options");
-
-    await wait(1000);
-
-    // Step 3: Finance > Manage
-    checkInputByLabel("finance");
-
-    await wait(800);
-
-    // Step 4: Click Next
-    const nextClicked = clickTextContains("next");
-
-    if (nextClicked) {
-      alert("✅ Access Assigned Successfully!");
-    } else {
-      alert("⚠️ Could not find Next button.");
+  function clickNextOrSpan(text) {
+    const el = [...document.querySelectorAll("span, div, button")]
+      .find(e => e.innerText.trim().toLowerCase() === text.toLowerCase());
+    if (el) {
+      el.click();
+      return true;
     }
+    return false;
   }
 
-  run();
+  function checkByLabel(labelText) {
+    const label = [...document.querySelectorAll("label")]
+      .find(el => el.innerText.toLowerCase().includes(labelText.toLowerCase()));
+    if (label) {
+      const input = label.querySelector('input[type="checkbox"]');
+      if (input && !input.checked) {
+        input.click();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  let email = prompt("📨 Enter the email to assign access:", "");
+  if (!email) return;
+
+  // Step 1: Fill Email
+  let emailSet = setInputByLabel("Email address", email);
+  await wait(1000);
+
+  // Step 2: Uncheck Temporary Access
+  let tempUnchecked = checkByLabel("Temporary access");
+  await wait(500);
+
+  // Step 3: Click "Next"
+  clickNextOrSpan("Next");
+  await wait(1500);
+
+  // Step 4: Full control (Manage)
+  checkByLabel("Full control");
+  await wait(500);
+
+  // Step 5: Click Advanced Options
+  clickNextOrSpan("View advanced options");
+  await wait(1200);
+
+  // Step 6: Finance > Manage
+  checkByLabel("Finance");
+  await wait(800);
+
+  // Step 7: Next > OK
+  clickNextOrSpan("Next");
+  await wait(1500);
+  clickNextOrSpan("OK");
+
+  alert("✅ Access automation completed!");
 })();
