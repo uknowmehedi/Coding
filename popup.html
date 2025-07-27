@@ -24,6 +24,7 @@ javascript:(async function(){
     const el = [...document.querySelectorAll("span, div, button")]
       .find(e => e.innerText.trim().toLowerCase() === text.toLowerCase());
     if (el) {
+      el.removeAttribute("disabled"); // Make sure it's enabled
       el.click();
       return true;
     }
@@ -43,26 +44,33 @@ javascript:(async function(){
     return false;
   }
 
-  let email = prompt("📨 Enter the email to assign access:", "");
+  function enableButtonsByText(text) {
+    [...document.querySelectorAll("button")]
+      .filter(btn => btn.innerText.trim().toLowerCase() === text.toLowerCase())
+      .forEach(btn => btn.removeAttribute("disabled"));
+  }
+
+  let email = prompt("📨 Enter email to assign access:", "");
   if (!email) return;
 
   // Step 1: Fill Email
-  let emailSet = setInputByLabel("Email address", email);
-  await wait(1000);
+  setInputByLabel("Email address", email);
+  await wait(1200);
 
   // Step 2: Uncheck Temporary Access
-  let tempUnchecked = checkByLabel("Temporary access");
-  await wait(500);
+  checkByLabel("Temporary access");
+  await wait(800);
 
-  // Step 3: Click "Next"
+  // Step 3: Enable and Click Next
+  enableButtonsByText("Next");
   clickNextOrSpan("Next");
   await wait(1500);
 
-  // Step 4: Full control (Manage)
+  // Step 4: Full control
   checkByLabel("Full control");
-  await wait(500);
+  await wait(800);
 
-  // Step 5: Click Advanced Options
+  // Step 5: View advanced options
   clickNextOrSpan("View advanced options");
   await wait(1200);
 
@@ -70,10 +78,14 @@ javascript:(async function(){
   checkByLabel("Finance");
   await wait(800);
 
-  // Step 7: Next > OK
+  // Step 7: Enable and Click Next
+  enableButtonsByText("Next");
   clickNextOrSpan("Next");
   await wait(1500);
+
+  // Step 8: Final OK
+  enableButtonsByText("OK");
   clickNextOrSpan("OK");
 
-  alert("✅ Access automation completed!");
+  alert("✅ Done: Invite sent with full access!");
 })();
