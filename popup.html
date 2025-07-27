@@ -1,39 +1,59 @@
 javascript:(function(){
-  function clickByText(tag, text) {
-    const el = [...document.querySelectorAll(tag)].find(e => e.innerText.trim().toLowerCase() === text.toLowerCase());
-    if (el) el.click();
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  function checkManageByLabel(labelText) {
-    const label = [...document.querySelectorAll("label")].find(el => el.innerText.includes(labelText));
-    if (label) {
-      const input = label.querySelector('input[type="checkbox"]');
-      if (input && !input.checked) input.click();
+  function clickTextContains(text) {
+    const el = [...document.querySelectorAll("span, div, button")]
+      .find(e => e.innerText && e.innerText.toLowerCase().includes(text.toLowerCase()));
+    if (el) {
+      el.click();
+      return true;
+    }
+    return false;
+  }
+
+  function checkInputByLabel(text) {
+    const labels = document.querySelectorAll('label');
+    for (const label of labels) {
+      if (label.innerText && label.innerText.toLowerCase().includes(text.toLowerCase())) {
+        const checkbox = label.querySelector('input[type="checkbox"]');
+        if (checkbox && !checkbox.checked) {
+          checkbox.click();
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  async function run() {
+    alert("🔄 Starting Assign Access Automation...");
+
+    // Step 1: Partial Access > Manage (Apps and Integrations)
+    checkInputByLabel("Apps and integrations");
+
+    await wait(800);
+
+    // Step 2: View Advanced Options
+    clickTextContains("view advanced options");
+
+    await wait(1000);
+
+    // Step 3: Finance > Manage
+    checkInputByLabel("finance");
+
+    await wait(800);
+
+    // Step 4: Click Next
+    const nextClicked = clickTextContains("next");
+
+    if (nextClicked) {
+      alert("✅ Access Assigned Successfully!");
+    } else {
+      alert("⚠️ Could not find Next button.");
     }
   }
 
-  function wait(fn, delay = 1000) {
-    setTimeout(fn, delay);
-  }
-
-  // Step 1: Tick Partial Access > Manage
-  wait(() => {
-    checkManageByLabel("Apps and integrations");
-    
-    // Step 2: Click "View advanced options"
-    wait(() => {
-      clickByText("span", "View advanced options");
-
-      // Step 3: Tick Finance > Manage
-      wait(() => {
-        checkManageByLabel("Finance");
-
-        // Step 4: Click Next
-        wait(() => {
-          clickByText("span", "Next");
-          alert("✅ Assign Access automation complete!");
-        }, 1000);
-      }, 1000);
-    }, 1000);
-  }, 1000);
+  run();
 })();
