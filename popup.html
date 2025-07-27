@@ -24,20 +24,24 @@ javascript:(async function(){
     const el = [...document.querySelectorAll("span, div, button")]
       .find(e => e.innerText.trim().toLowerCase() === text.toLowerCase());
     if (el) {
-      el.removeAttribute("disabled"); // Make sure it's enabled
+      el.removeAttribute("disabled");
       el.click();
       return true;
     }
     return false;
   }
 
-  function checkByLabel(labelText) {
+  function checkByLabelForce(labelText) {
     const label = [...document.querySelectorAll("label")]
       .find(el => el.innerText.toLowerCase().includes(labelText.toLowerCase()));
     if (label) {
-      const input = label.querySelector('input[type="checkbox"]');
-      if (input && !input.checked) {
-        input.click();
+      const checkbox = label.querySelector('input[type="checkbox"]');
+      if (checkbox) {
+        checkbox.disabled = false; // force enable if disabled
+        if (!checkbox.checked) {
+          checkbox.click();
+          console.log(`☑️ Checked: ${labelText}`);
+        }
         return true;
       }
     }
@@ -50,42 +54,42 @@ javascript:(async function(){
       .forEach(btn => btn.removeAttribute("disabled"));
   }
 
-  let email = prompt("📨 Enter email to assign access:", "");
+  let email = prompt("📧 Enter email to assign:", "");
   if (!email) return;
 
-  // Step 1: Fill Email
+  // Step 1: Email input
   setInputByLabel("Email address", email);
   await wait(1200);
 
   // Step 2: Uncheck Temporary Access
-  checkByLabel("Temporary access");
+  checkByLabelForce("Temporary access");
   await wait(800);
 
-  // Step 3: Enable and Click Next
+  // Step 3: Next
   enableButtonsByText("Next");
   clickNextOrSpan("Next");
   await wait(1500);
 
-  // Step 4: Full control
-  checkByLabel("Full control");
+  // Step 4: Full control - Manage
+  checkByLabelForce("Full control");
   await wait(800);
 
-  // Step 5: View advanced options
+  // Step 5: View Advanced Options
   clickNextOrSpan("View advanced options");
   await wait(1200);
 
-  // Step 6: Finance > Manage
-  checkByLabel("Finance");
+  // Step 6: Finance - Manage
+  checkByLabelForce("Finance");
   await wait(800);
 
-  // Step 7: Enable and Click Next
+  // Step 7: Next
   enableButtonsByText("Next");
   clickNextOrSpan("Next");
   await wait(1500);
 
-  // Step 8: Final OK
+  // Step 8: OK
   enableButtonsByText("OK");
   clickNextOrSpan("OK");
 
-  alert("✅ Done: Invite sent with full access!");
+  alert("✅ Done: Manage access granted and invite sent.");
 })();
