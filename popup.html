@@ -1,65 +1,176 @@
-javascript:(function(){
-  async function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  async function run() {
-    const email = prompt("Enter Email to Invite:");
-    if (!email) return;
-
-    function setInputValue(input, value) {
-      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-      nativeSetter?.call(input, value);
-      input.dispatchEvent(new Event('input', { bubbles: true }));
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quiz Giri Style</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff;
+      color: #333;
     }
 
-    function clickByText(text) {
-      const el = Array.from(document.querySelectorAll("button, div[role='button'], div[role='radio'], div[role='checkbox']"))
-        .find(e => e.innerText.trim().toLowerCase() === text.toLowerCase());
-      if (el) el.click();
+    header {
+      background-color: #e5007d;
+      padding: 14px 20px;
+      color: #fff;
+      font-size: 22px;
+      font-weight: bold;
     }
 
-    // STEP 1: Insert Email
-    let inputBox = Array.from(document.querySelectorAll("input[type='text'], input[type='email']"))
-      .find(i => i.outerHTML.includes("Notifications from the business") || i.ariaLabel?.toLowerCase().includes("email"));
-    if (inputBox) {
-      setInputValue(inputBox, email);
-    } else {
-      alert("❌ Email input not found");
-      return;
+    .section {
+      padding: 20px;
     }
 
-    await sleep(800);
-
-    // STEP 2: Uncheck Temporary Access
-    const tempLabel = Array.from(document.querySelectorAll("label")).find(l => l.innerText.toLowerCase().includes("temporary access"));
-    if (tempLabel) {
-      const checkbox = tempLabel.querySelector("input[type='checkbox']");
-      if (checkbox?.checked) tempLabel.click();
+    .quiz-box {
+      background: #ff1ead;
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 30px;
     }
 
-    await sleep(600);
-    clickByText("Next");
-    await sleep(1200);
+    .quiz-box h3 {
+      margin-bottom: 12px;
+      font-size: 20px;
+    }
 
-    // STEP 3: Assign Access
-    clickByText("Manage");
-    await sleep(800);
+    .options {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 15px 0;
+    }
 
-    clickByText("View advanced options");
-    await sleep(800);
+    .option {
+      background: #fff;
+      color: #e5007d;
+      border: 2px solid #e5007d;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
 
-    clickByText("Manage"); // Finance
-    await sleep(800);
+    .option:hover {
+      background: #e5007d;
+      color: #fff;
+    }
 
-    clickByText("Next");
-    await sleep(1000);
+    .play-btn {
+      background: #ffc107;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-    clickByText("Send invitation");
-    await sleep(1000);
+    .leaderboard {
+      text-align: center;
+    }
 
-    clickByText("OK");
-  }
+    .leaderboard h2 {
+      margin-bottom: 20px;
+      color: #e5007d;
+    }
 
-  run();
-})();
+    .leader {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .player {
+      text-align: center;
+      max-width: 120px;
+    }
+
+    .player img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #e5007d;
+    }
+
+    .player h4 {
+      margin: 8px 0 4px;
+      font-size: 16px;
+    }
+
+    .player p {
+      margin: 0;
+      font-weight: bold;
+      color: #e5007d;
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 13px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+<header>Quiz Giri</header>
+
+<div class="section">
+  <!-- Quiz Box -->
+  <div class="quiz-box">
+    <h3>বাংলাদেশের বিভাগ কয়টি?</h3>
+    <div class="options">
+      <div class="option">ক. ৫টি</div>
+      <div class="option">খ. ৮টি</div>
+    </div>
+    <button class="play-btn">খেলুন</button>
+  </div>
+
+  <!-- Leaderboard -->
+  <div class="leaderboard">
+    <h2>🏆 লিডারবোর্ড</h2>
+    <div class="leader">
+      <div class="player">
+        <img src="https://i.ibb.co/SvNVkXv/person2.jpg" alt="Maruf">
+        <h4>মারুফ আহমেদ</h4>
+        <p>9765</p>
+      </div>
+      <div class="player">
+        <img src="https://i.ibb.co/svLTXsZ/person1.jpg" alt="Sohel">
+        <h4>সোহেল রানা</h4>
+        <p>7567</p>
+      </div>
+      <div class="player">
+        <img src="https://i.ibb.co/yXLFwtv/person3.jpg" alt="Riya">
+        <h4>রিয়া হোসেন</h4>
+        <p>4674</p>
+      </div>
+      <div class="player">
+        <img src="https://i.ibb.co/LC04j7f/person4.jpg" alt="Arman">
+        <h4>আর্মান হোসেন</h4>
+        <p>3621</p>
+      </div>
+      <div class="player">
+        <img src="https://i.ibb.co/PtZWD8j/person5.jpg" alt="Nusrat">
+        <h4>নুসরাত জাহান</h4>
+        <p>2948</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  &copy; 2025 Quiz Giri Design | Developed by Baro Bata 🐇
+</footer>
+
+</body>
+</html>
