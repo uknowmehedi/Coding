@@ -1,25 +1,108 @@
-{
-  "manifest_version": 3,
-  "name": "GitHub Live Sync Shell",
-  "version": "1.0.0",
-  "description": "Fetch & cache latest source files from GitHub raw links. Manual Update + per-file download.",
-  "permissions": ["storage", "alarms", "downloads"],
-  "host_permissions": ["https://raw.githubusercontent.com/*"],
-  "action": {
-    "default_title": "Live Sync",
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "32": "icons/icon32.png",
-      "48": "icons/icon48.png"
-    }
-  },
-  "background": {
-    "service_worker": "background.js"
-  },
-  "icons": {
-    "16": "icons/icon16.png",
-    "32": "icons/icon32.png",
-    "48": "icons/icon48.png"
-  }
+
+// background.js — MV3 service worker
+
+// 🔗 GitHub Raw links (তোমার রিপো অনুযায়ী)
+const RAW_MAP = {
+  "popup.html": "https://raw.githubusercontent.com/uknowmehedi/facebook-find-id/refs/heads/main/popup.html",
+  "popup.css":  "https://raw.githubusercontent.com/uknowmehedi/facebook-find-id/refs/heads/main/popup.css",
+  "popup.js":   "https://raw.githubusercontent.com/uknowmehedi/facebook-find-id/refs/heads/main/popup.js",
+  "content.js": "https://raw.githubusercontent.com/uknowmehedi/facebook-find-id/refs/heads/main/content.js",
+  "background.js": "https://raw.githubusercontent.com/uknowmehedi/facebook-find-id/refs/heads/main/background.js",
+  "manifest.json":  "https://raw.githubusercontent.com/uknowmehedi/facebook-find-id/refs/heads/main/manifest.json"
+};
+
+const STORAGE_KEY = "gh_live_sync_cache";
+const META_KEY = "gh_live_sync_meta";
+const DEFAULT_INTERVAL_MIN = 5; // auto-sync প্রতি ~৫ মিনিটে
+
+async function fetchWithETag(url, etag) {
+  const headers = {};
+  if (etag) headers["If-None-Match"] = etag;
+  const resp = await fetch(url, { headers });
+  if (resp.status === 304) return { status: 304 };
+  if (!resp.ok) throw new Error(`Fetch failed ${resp.status} for ${url}`);
+  const text = await resp.text();
+  const newETag = resp.headers.get("ETag") || null;
+  return { status: 200, text, etag: newETag };
 }
+
+async function loadCache() {
+  const got = await chrome.storage.local.get([STORAGE_KEY, META_KEY]);
+  return { cache: got[STORAGE_KEY] || {}, meta: got[META_KEY] || {} };
+}
+async function saveCache(cache, meta) {
+  await chrome.storage.local.set({ [STORAGE_KEY]: cache, [META_KEY]: meta });
+}
+
+async function syncAll(force = false) {
+  const { cache, meta } = await loadCache();
+  let changed = false;
+  const results = {};
+
+  for (const [name, url] of Object.entries(RAW_MAP)) {
+    const lastMeta = meta[name] || {};
+    try {
+      const res = await fetchWithETag(url, force ? null : lastMeta.etag);
+      if (res.status === 304 && !force) {
+        results[name] = { status: "not_modified" };
+        continue;
+      }
+      if (res.status === 200) {
+        cache[name] = res.text;
+        meta[name] = {
+          etag: res.etag || null,
+          lastUpdated: new Date().toISOString(),
+          url
+        };
+        results[name] = { status: "updated", size: res.text.length };
+        changed = true;
+      }
+    } catch (e) {
+      results[name] = { status: "error", error: e.message };
+    }
+  }
+
+  if (changed) await saveCache(cache, meta);
+  return { changed, results, meta };
+}
+
+// Install/Startup → Alarm + Initial Sync
+chrome.runtime.onInstalled.addListener(async () => {
+  chrome.alarms.create("ghLiveSync", { periodInMinutes: DEFAULT_INTERVAL_MIN });
+  await syncAll(true);
+});
+chrome.runtime.onStartup.addListener(async () => {
+  chrome.alarms.create("ghLiveSync", { periodInMinutes: DEFAULT_INTERVAL_MIN });
+});
+
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name === "ghLiveSync") await syncAll(false);
+});
+
+// Messages
+chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  (async () => {
+    if (msg?.type === "SYNC_NOW") {
+      const res = await syncAll(true);
+      sendResponse({ ok: true, ...res });
+    } else if (msg?.type === "GET_CACHE") {
+      const { cache, meta } = await loadCache();
+      sendResponse({ ok: true, cache, meta });
+    } else if (msg?.type === "DOWNLOAD_FILE" && msg.name) {
+      const { cache } = await loadCache();
+      const content = cache[msg.name] ?? "";
+      const blobUrl = URL.createObjectURL(new Blob([content], { type: "text/plain" }));
+      await chrome.downloads.download({
+        url: blobUrl,
+        filename: msg.name,
+        saveAs: true
+      });
+      sendResponse({ ok: true });
+    } else if (msg?.type === "LIST_FILES") {
+      sendResponse({ ok: true, files: Object.keys(RAW_MAP) });
+    } else {
+      sendResponse({ ok: false, error: "Unknown message" });
+    }
+  })();
+  return true; // async
+});
