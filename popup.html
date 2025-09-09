@@ -1,55 +1,29 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Live Sync</title>
-    <link rel="stylesheet" href="popup.css" />
-  </head>
-  <body>
-    <header class="row">
-      <div class="brand">
-        <img src="icons/icon32.png" width="20" height="20" alt="" />
-        <span>GitHub Live Sync</span>
-      </div>
-      <button id="syncNow" class="btn primary">Update Now</button>
-    </header>
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 12px;
+  font: 13px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  width: 420px; color: #1f2937; background: #f8fafc;
+}
+header.row {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+}
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.btn {
+  border: 0; padding: 8px 10px; border-radius: 10px; cursor: pointer; font-weight: 600;
+}
+.btn.primary { background: #2563eb; color: #fff; }
+.btn.ghost { background: #e5e7eb; }
+.card { background: #fff; border-radius: 14px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.06); margin-bottom: 10px; }
+.row { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+.k { font-size: 12px; color: #6b7280; }
+.v { font-size: 13px; font-weight: 600; }
 
-    <section id="meta" class="card">
-      <div class="row">
-        <div>
-          <div class="k">Auto Interval</div>
-          <div class="v">Every ~5 minutes</div>
-        </div>
-        <div>
-          <div class="k">Last Overall Update</div>
-          <div class="v" id="lastOverall">—</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card">
-      <h3>Files</h3>
-      <table id="filesTbl">
-        <thead>
-          <tr>
-            <th>File</th>
-            <th>Last Updated</th>
-            <th>Size</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="filesBody"></tbody>
-      </table>
-    </section>
-
-    <section class="tips">
-      <p>
-        ✅ আপডেট হওয়া ফাইলগুলো <b>Download</b> করে <b>chrome://extensions → Load unpacked</b>
-        দিয়ে রিলোড করতে পারো।<br/>
-        🔒 নোট: MV3 নীতিমালায় প্যাকেজড ফাইল runtime-এ রিপ্লেস করা যায় না—তাই নিরাপদ data-sync + export ব্যবহার করছি।
-      </p>
-    </section>
-
-    <script src="popup.js"></script>
-  </body>
-</html>
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 8px; text-align: left; }
+thead th { font-size: 12px; color: #6b7280; }
+tbody tr { border-top: 1px solid #f1f5f9; }
+td .small { font-size: 12px; color: #6b7280; }
+.actions { display: flex; gap: 6px; }
+.badge { font-size: 11px; padding: 2px 6px; border-radius: 6px; background: #eef2ff; color: #3730a3; }
+.status { margin-top: 10px; font-size: 12px; color: #374151; }
+.tips { font-size: 12px; color: #374151; opacity: .9; }
