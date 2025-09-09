@@ -1,29 +1,78 @@
-* { box-sizing: border-box; }
-body {
-  margin: 0; padding: 12px;
-  font: 13px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  width: 420px; color: #1f2937; background: #f8fafc;
-}
-header.row {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
-}
-.brand { display: flex; align-items: center; gap: 8px; font-weight: 600; }
-.btn {
-  border: 0; padding: 8px 10px; border-radius: 10px; cursor: pointer; font-weight: 600;
-}
-.btn.primary { background: #2563eb; color: #fff; }
-.btn.ghost { background: #e5e7eb; }
-.card { background: #fff; border-radius: 14px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.06); margin-bottom: 10px; }
-.row { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
-.k { font-size: 12px; color: #6b7280; }
-.v { font-size: 13px; font-weight: 600; }
+// popup.js
 
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 8px; text-align: left; }
-thead th { font-size: 12px; color: #6b7280; }
-tbody tr { border-top: 1px solid #f1f5f9; }
-td .small { font-size: 12px; color: #6b7280; }
-.actions { display: flex; gap: 6px; }
-.badge { font-size: 11px; padding: 2px 6px; border-radius: 6px; background: #eef2ff; color: #3730a3; }
-.status { margin-top: 10px; font-size: 12px; color: #374151; }
-.tips { font-size: 12px; color: #374151; opacity: .9; }
+const fmtTime = (iso) => (iso ? new Date(iso).toLocaleString() : "—");
+
+async function ask(msg) {
+  return await chrome.runtime.sendMessage(msg);
+}
+
+function rowFor(name, meta, cache) {
+  const m = meta[name] || {};
+  const text = cache[name] ?? "";
+  const size = text ? `${text.length} chars` : "—";
+  const last = m.lastUpdated ? fmtTime(m.lastUpdated) : "—";
+
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td><code>${name}</code><div class="small">${m.url ? m.url : ""}</div></td>
+    <td>${last}</td>
+    <td>${size}</td>
+    <td>
+      <div class="actions">
+        <button data-dl="${name}" class="btn ghost">Download</button>
+      </div>
+    </td>
+  `;
+  return tr;
+}
+
+async function render() {
+  const { ok, cache = {}, meta = {} } = await ask({ type: "GET_CACHE" });
+  if (!ok) return;
+
+  // overall last updated
+  let lastOverall = null;
+  Object.values(meta).forEach(m => {
+    if (m?.lastUpdated) {
+      const t = new Date(m.lastUpdated).getTime();
+      if (!lastOverall || t > lastOverall) lastOverall = t;
+    }
+  });
+  document.getElementById("lastOverall").textContent = lastOverall ? new Date(lastOverall).toLocaleString() : "—";
+
+  const tableBody = document.getElementById("filesBody");
+  tableBody.innerHTML = "";
+
+  // show rows for known files even if cache empty
+  const names = Object.keys(meta).length ? Object.keys(meta) : Object.keys(cache);
+  (names.length ? names : []).forEach(name => {
+    tableBody.appendChild(rowFor(name, meta, cache));
+  });
+
+  tableBody.querySelectorAll("button[data-dl]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const name = btn.getAttribute("data-dl");
+      btn.disabled = true;
+      await ask({ type: "DOWNLOAD_FILE", name });
+      btn.disabled = false;
+    });
+  });
+}
+
+document.getElementById("syncNow").addEventListener("click", async (e) => {
+  const btn = e.currentTarget;
+  btn.disabled = true;
+  btn.textContent = "Updating…";
+  const res = await ask({ type: "SYNC_NOW" });
+  await render();
+  btn.textContent = "Update Now";
+  btn.disabled = false;
+
+  const status = document.createElement("div");
+  status.className = "status";
+  status.textContent = res?.changed ? "Synced: updates applied." : "Synced: no changes.";
+  document.body.appendChild(status);
+  setTimeout(() => status.remove(), 3000);
+});
+
+render();
