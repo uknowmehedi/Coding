@@ -1,108 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Live Sync</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="row">
+      <div class="brand">
+        <img src="icons/icon32.png" width="20" height="20" alt="" />
+        <span>GitHub Live Sync</span>
+      </div>
+      <button id="syncNow" class="btn primary">Update Now</button>
+    </header>
 
-// background.js — MV3 service worker
+    <section id="meta" class="card">
+      <div class="row">
+        <div>
+          <div class="k">Auto Interval</div>
+          <div class="v">Every ~5 minutes</div>
+        </div>
+        <div>
+          <div class="k">Last Overall Update</div>
+          <div class="v" id="lastOverall">—</div>
+        </div>
+      </div>
+    </section>
 
-// 🔗 GitHub Raw links (তোমার রিপো অনুযায়ী)
-const RAW_MAP = {
-  "popup.html": "https://raw.githubusercontent.com/uknowmehedi/facebook-find-id/refs/heads/main/popup.html",
-  "popup.css":  "https://raw.githubusercontent.com/uknowmehedi/facebook-find-id/refs/heads/main/popup.css",
-  "popup.js":   "https://raw.githubusercontent.com/uknowmehedi/facebook-find-id/refs/heads/main/popup.js",
-  "content.js": "https://raw.githubusercontent.com/uknowmehedi/facebook-find-id/refs/heads/main/content.js",
-  "background.js": "https://raw.githubusercontent.com/uknowmehedi/facebook-find-id/refs/heads/main/background.js",
-  "manifest.json":  "https://raw.githubusercontent.com/uknowmehedi/facebook-find-id/refs/heads/main/manifest.json"
-};
+    <section class="card">
+      <h3>Files</h3>
+      <table id="filesTbl">
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>Last Updated</th>
+            <th>Size</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="filesBody"></tbody>
+      </table>
+    </section>
 
-const STORAGE_KEY = "gh_live_sync_cache";
-const META_KEY = "gh_live_sync_meta";
-const DEFAULT_INTERVAL_MIN = 5; // auto-sync প্রতি ~৫ মিনিটে
+    <section class="tips">
+      <p>
+        ✅ আপডেট হওয়া ফাইলগুলো <b>Download</b> করে <b>chrome://extensions → Load unpacked</b>
+        দিয়ে রিলোড করতে পারো।<br/>
+        🔒 নোট: MV3 নীতিমালায় প্যাকেজড ফাইল runtime-এ রিপ্লেস করা যায় না—তাই নিরাপদ data-sync + export ব্যবহার করছি।
+      </p>
+    </section>
 
-async function fetchWithETag(url, etag) {
-  const headers = {};
-  if (etag) headers["If-None-Match"] = etag;
-  const resp = await fetch(url, { headers });
-  if (resp.status === 304) return { status: 304 };
-  if (!resp.ok) throw new Error(`Fetch failed ${resp.status} for ${url}`);
-  const text = await resp.text();
-  const newETag = resp.headers.get("ETag") || null;
-  return { status: 200, text, etag: newETag };
-}
-
-async function loadCache() {
-  const got = await chrome.storage.local.get([STORAGE_KEY, META_KEY]);
-  return { cache: got[STORAGE_KEY] || {}, meta: got[META_KEY] || {} };
-}
-async function saveCache(cache, meta) {
-  await chrome.storage.local.set({ [STORAGE_KEY]: cache, [META_KEY]: meta });
-}
-
-async function syncAll(force = false) {
-  const { cache, meta } = await loadCache();
-  let changed = false;
-  const results = {};
-
-  for (const [name, url] of Object.entries(RAW_MAP)) {
-    const lastMeta = meta[name] || {};
-    try {
-      const res = await fetchWithETag(url, force ? null : lastMeta.etag);
-      if (res.status === 304 && !force) {
-        results[name] = { status: "not_modified" };
-        continue;
-      }
-      if (res.status === 200) {
-        cache[name] = res.text;
-        meta[name] = {
-          etag: res.etag || null,
-          lastUpdated: new Date().toISOString(),
-          url
-        };
-        results[name] = { status: "updated", size: res.text.length };
-        changed = true;
-      }
-    } catch (e) {
-      results[name] = { status: "error", error: e.message };
-    }
-  }
-
-  if (changed) await saveCache(cache, meta);
-  return { changed, results, meta };
-}
-
-// Install/Startup → Alarm + Initial Sync
-chrome.runtime.onInstalled.addListener(async () => {
-  chrome.alarms.create("ghLiveSync", { periodInMinutes: DEFAULT_INTERVAL_MIN });
-  await syncAll(true);
-});
-chrome.runtime.onStartup.addListener(async () => {
-  chrome.alarms.create("ghLiveSync", { periodInMinutes: DEFAULT_INTERVAL_MIN });
-});
-
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name === "ghLiveSync") await syncAll(false);
-});
-
-// Messages
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-  (async () => {
-    if (msg?.type === "SYNC_NOW") {
-      const res = await syncAll(true);
-      sendResponse({ ok: true, ...res });
-    } else if (msg?.type === "GET_CACHE") {
-      const { cache, meta } = await loadCache();
-      sendResponse({ ok: true, cache, meta });
-    } else if (msg?.type === "DOWNLOAD_FILE" && msg.name) {
-      const { cache } = await loadCache();
-      const content = cache[msg.name] ?? "";
-      const blobUrl = URL.createObjectURL(new Blob([content], { type: "text/plain" }));
-      await chrome.downloads.download({
-        url: blobUrl,
-        filename: msg.name,
-        saveAs: true
-      });
-      sendResponse({ ok: true });
-    } else if (msg?.type === "LIST_FILES") {
-      sendResponse({ ok: true, files: Object.keys(RAW_MAP) });
-    } else {
-      sendResponse({ ok: false, error: "Unknown message" });
-    }
-  })();
-  return true; // async
-});
+    <script src="popup.js"></script>
+  </body>
+</html>
