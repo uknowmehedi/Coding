@@ -1,78 +1,17 @@
-// popup.js
+// content.js — example placeholder.
+// NOTE: আমরা রিমোট JS eval করি না (MV3 policy)।
+// এখানে প্যাকেজড কোডেই কাজ করবে; তবে তুমি চাইলে ক্যাশে রাখা
+// "content.js" টেক্সট রেফারেন্স হিসেবে পড়তে পারো।
 
-const fmtTime = (iso) => (iso ? new Date(iso).toLocaleString() : "—");
+(async () => {
+  try {
+    const got = await chrome.storage.local.get("gh_live_sync_cache");
+    const cache = got.gh_live_sync_cache || {};
+    const remoteContent = cache["content.js"] || "";
+    console.debug("[Live Sync] remote content.js length:", remoteContent.length);
 
-async function ask(msg) {
-  return await chrome.runtime.sendMessage(msg);
-}
-
-function rowFor(name, meta, cache) {
-  const m = meta[name] || {};
-  const text = cache[name] ?? "";
-  const size = text ? `${text.length} chars` : "—";
-  const last = m.lastUpdated ? fmtTime(m.lastUpdated) : "—";
-
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td><code>${name}</code><div class="small">${m.url ? m.url : ""}</div></td>
-    <td>${last}</td>
-    <td>${size}</td>
-    <td>
-      <div class="actions">
-        <button data-dl="${name}" class="btn ghost">Download</button>
-      </div>
-    </td>
-  `;
-  return tr;
-}
-
-async function render() {
-  const { ok, cache = {}, meta = {} } = await ask({ type: "GET_CACHE" });
-  if (!ok) return;
-
-  // overall last updated
-  let lastOverall = null;
-  Object.values(meta).forEach(m => {
-    if (m?.lastUpdated) {
-      const t = new Date(m.lastUpdated).getTime();
-      if (!lastOverall || t > lastOverall) lastOverall = t;
-    }
-  });
-  document.getElementById("lastOverall").textContent = lastOverall ? new Date(lastOverall).toLocaleString() : "—";
-
-  const tableBody = document.getElementById("filesBody");
-  tableBody.innerHTML = "";
-
-  // show rows for known files even if cache empty
-  const names = Object.keys(meta).length ? Object.keys(meta) : Object.keys(cache);
-  (names.length ? names : []).forEach(name => {
-    tableBody.appendChild(rowFor(name, meta, cache));
-  });
-
-  tableBody.querySelectorAll("button[data-dl]").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const name = btn.getAttribute("data-dl");
-      btn.disabled = true;
-      await ask({ type: "DOWNLOAD_FILE", name });
-      btn.disabled = false;
-    });
-  });
-}
-
-document.getElementById("syncNow").addEventListener("click", async (e) => {
-  const btn = e.currentTarget;
-  btn.disabled = true;
-  btn.textContent = "Updating…";
-  const res = await ask({ type: "SYNC_NOW" });
-  await render();
-  btn.textContent = "Update Now";
-  btn.disabled = false;
-
-  const status = document.createElement("div");
-  status.className = "status";
-  status.textContent = res?.changed ? "Synced: updates applied." : "Synced: no changes.";
-  document.body.appendChild(status);
-  setTimeout(() => status.remove(), 3000);
-});
-
-render();
+    // তোমার আসল কনটেন্ট-স্ক্রিপ্ট লজিক এখানে লিখো।
+  } catch (e) {
+    console.warn("[Live Sync] content error:", e);
+  }
+})();
